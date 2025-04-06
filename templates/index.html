@@ -1,0 +1,330 @@
+{% extends "partials/base.html" %}
+    <!-- ***** Header Area End ***** -->
+{% block content %}
+    <!-- ***** Hero Area Start ***** -->
+    <section class="hero-area">
+        <div class="hero-slides owl-carousel">
+            <!-- Single Hero Slide -->
+            <div class="single-hero-slide bg-img bg-overlay-white" style="background-image: url('{{ url_for('static', filename='img/bg-img/iamed1.jpg') }}');">
+                <div class="container h-100">
+                    <div class="row h-100 align-items-center">
+                        <div class="col-12">
+                            <div class="hero-slides-content">
+                                <h2 data-animation="fadeInUp" data-delay="100ms">BIENVENUE SUR MED_IA</h2>
+                                <h4 data-animation="fadeInUp" data-delay="400ms">Un diagnostic rapide, sous l'oeil de l'IA.</h4>
+                                <a href="#" class="btn medilife-btn mt-50" data-animation="fadeInUp" data-delay="700ms">Decouvrir MED_IA<span>+</span></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Single Hero Slide -->
+            <div class="single-hero-slide bg-img bg-overlay-white" style="background-image: url('{{ url_for('static', filename='img/bg-img/robot-hand-iStock.webp') }}');">
+                <div class="container h-100">
+                    <div class="row h-100 align-items-center">
+                        <div class="col-12">
+                            <div class="hero-slides-content">
+                                <h2 data-animation="fadeInUp" data-delay="100ms">BIENVENUE SUR MED_IA</h2>
+                                <h4 data-animation="fadeInUp" data-delay="400ms">Un diagnostic rapide, sous l'oeil de l'IA.</h4>
+                                <a href="#" class="btn medilife-btn mt-50" data-animation="fadeInUp" data-delay="700ms">Decouvrir MED_IA<span>+</span></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Single Hero Slide -->
+            <div class="single-hero-slide bg-img bg-overlay-white" style="background-image: url('{{ url_for('static', filename='img/bg-img/medcin.webp') }}');">
+                <div class="container h-100">
+                    <div class="row h-100 align-items-center">
+                        <div class="col-12">
+                            <div class="hero-slides-content">
+                                <h2 data-animation="fadeInUp" data-delay="100ms">BIENVENUE SUR MED_IA</h2>
+                                <h4 data-animation="fadeInUp" data-delay="400ms">Un diagnostic rapide, sous l'oeil de l'IA.</h4>
+                                <a href="#" class="btn medilife-btn mt-50" data-animation="fadeInUp" data-delay="700ms">Decouvrir MED_IA<span>+</span></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ***** Hero Area End ***** -->
+
+    <!-- ***** Book An Appoinment Area Start ***** -->
+    <div class="medilife-book-an-appoinment-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="appointment-form-content">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-12 col-lg-9">
+                                <div class="medilife-appointment-form">
+                                    <form action="#" method="post">
+                                        <div class="row align-items-end">
+                                            <div class="col-12 col-md-4">
+                                                <div class="form-group">
+                                                    <select class="form-control" id="specialité">
+                                                    <option>Specialité 1</option>
+                                                    <option>Specialité 2</option>
+                                                    <option>Specialité 3</option>
+                                                    <option>Specialité 4</option>
+                                                    <option>Specialité 5</option>
+                                                </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-4">
+                                                <div class="form-group">
+                                                    <select class="form-control" id="docteurs">
+                                                    <option>Docteur 1</option>
+                                                    <option>Docteur 2</option>
+                                                    <option>Docteur 3</option>
+                                                    <option>Docteur 4</option>
+                                                    <option>Docteur 5</option>
+                                                </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-2">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control" name="date" id="date" placeholder="Date">
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-2">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control" name="time" id="time" placeholder="Heure">
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-4">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control border-top-0 border-right-0 border-left-0" name="name" id="name" placeholder="Nom">
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-4">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control border-top-0 border-right-0 border-left-0" name="number" id="number" placeholder="Telephone">
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-4">
+                                                <div class="form-group">
+                                                    <input type="email" class="form-control border-top-0 border-right-0 border-left-0" name="email" id="email" placeholder="E-mail">
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-7">
+                                                <div class="form-group mb-0">
+                                                    <textarea name="message" class="form-control mb-0 border-top-0 border-right-0 border-left-0" id="message" cols="30" rows="10" placeholder="Message"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-5 mb-0">
+                                                <div class="form-group mb-0">
+                                                    <button type="submit" class="btn medilife-btn">Faire un commentaire<span>+</span></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-3">
+                                <div class="medilife-contact-info">
+                                    <!-- Single Contact Info -->
+                                    <div class="single-contact-info mb-30">
+                                        <img src="img/icons/alarm-clock.png" alt="">
+                                        <p>Tous les jours <br>24h/24</p>
+                                    </div>
+                                    <!-- Single Contact Info -->
+                                    <div class="single-contact-info mb-30">
+                                        <img src="img/icons/envelope.png" alt="">
+                                        <p>+2250105789625 <br>Med_ia@.com</p>
+                                    </div>
+                                    <!-- Single Contact Info -->
+                                    <div class="single-contact-info">
+                                        <img src="img/icons/map-pin.png" alt="">
+                                        <p>Abidjan, Cocody<br>Côte d'Ivoire</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Book An Appoinment Area End ***** -->
+
+    <!-- ***** About Us Area Start ***** -->
+    <section class="medica-about-us-area section-padding-100-20">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-4">
+                    <div class="medica-about-content">
+                        <h2>Qui est MED_IA</h2>
+                        <p>Notre IA vous aide à analyser vos symptômes et vous oriente vers la meilleure décision médicale."</p>
+                        <a href="#" class="btn medilife-btn mt-50">VOIR NOS SERVICES<span>+</span></a>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-8">
+                    <div class="row">
+                        <!-- Single Service Area -->
+                        <div class="col-12 col-sm-6">
+                            <div class="single-service-area d-flex">
+                                <div class="service-icon">
+                                    <i class="icon-doctor"></i>
+                                </div>
+                                <div class="service-content">
+                                    <h5>Savoir s'orientation</h5>
+                                    <p>Écoutez votre corps et laissez MED_IA vous guider. MED_IA analyse vos symptômes pour vous guider vers la meilleure décision médicale."</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Single Service Area -->
+                        <div class="col-12 col-sm-6">
+                            <div class="single-service-area d-flex">
+                                <div class="service-icon">
+                                    <i class="icon-blood-donation-1"></i>
+                                </div>
+                                <div class="service-content">
+                                    <h5>Prendre une bonne décision</h5>
+                                    <p>Ne restez plus dans l’incertitude ! Évaluez la gravité de vos symptômes et agissez en toute confiance avec MED_IA.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Single Service Area -->
+                        <div class="col-12 col-sm-6">
+                            <div class="single-service-area d-flex">
+                                <div class="service-icon">
+                                    <i class="icon-flask-2"></i>
+                                </div>
+                                <div class="service-content">
+                                    <h5>Demander conseils</h5>
+                                    <p>Un doute ? Obtenez des recommandations médicales fiables et adaptées à votre état de santé</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Single Service Area -->
+                        <div class="col-12 col-sm-6">
+                            <div class="single-service-area d-flex">
+                                <div class="service-icon">
+                                    <i class="icon-emergency-call-1"></i>
+                                </div>
+                                <div class="service-content">
+                                    <h5>Sauver une vie</h5>
+                                    <p>Une détection précoce peut tout changer. MED_IA vous aide à réagir à temps."</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ***** About Us Area End ***** -->
+
+    <!-- ***** Cool Facts Area Start ***** -->
+    
+    <!-- ***** Cool Facts Area End ***** -->
+
+    <!-- ***** Gallery Area Start ***** -->
+    
+    <!-- ***** Features Area Start ***** -->
+    <div class="medilife-features-area section-padding-100">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-12 col-lg-6">
+                    <div class="features-content">
+                        <h2>Pourquoi choisir MED_IA</h2>
+                        <p>Notre chatbot analyse vos symptômes en 2 min, 24h/24, avec des recommandations personnalisées basées sur des données médicales certifiées. Il distingue les urgences des cas bénins, vous orientant vers la meilleure prise en charge. Gain de temps, réduction des coûts et accès aux soins optimisé, partout et pour tous.</p>
+                        <a href="#" class="btn medilife-btn mt-50">Decouvrir MED_IA<span>+</span></a>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                    <div class="features-thumbnail">
+                        <img src="{{ url_for('static', filename='img/blog-img/pourquoi.webp') }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Features Area End ***** -->
+
+    <!-- ***** Blog Area Start ***** -->
+    <div class="medilife-blog-area section-padding-100-0">
+        <div class="container">
+            <div class="temoignages"> <h2>Temoignages</h2></div>
+                <!-- Single Blog Area -->
+            <div class="row">
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="single-blog-area mb-100">
+                        <!-- Post Thumbnail -->
+                        <div class="blog-post-thumbnail">
+                            <img src="{{ url_for('static', filename='img/blog-img/toux.jpg') }}" alt="">
+                            <!-- Post Date -->
+                            <div class="post-date">
+                                <a href="#">Mars 23, 2025</a>
+                            </div>
+                        </div>
+                        <!-- Post Content -->
+                        <div class="post-content">
+                            <div class="post-author">
+                                <a href="#"><img src="{{ url_for('static', filename='img/blog-img/avatar.avif') }}" alt=""></a>
+                            </div>
+                            <a href="#" class="headline">Pneumologie</a>
+                            <p>"Quand j'ai eu des douleurs à la poitrine et des crachats sanglants, MED_IA m'a immédiatement alerté sur un risque d'embolie pulmonaire. Aux urgences, ils ont confirmé et m'ont pris en charge à temps."
+                               <br> - Nadège T., 45 ans</p>
+                            <a href="#" class="comments">+ de Commentaires</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Single Blog Area -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="single-blog-area mb-100">
+                        <!-- Post Thumbnail -->
+                        <div class="blog-post-thumbnail">
+                            <img src="{{ url_for('static', filename='img/blog-img/handicap-eczema.jpg') }}" alt="">
+                            <!-- Post Date -->
+                            <div class="post-date">
+                                <a href="#">Mars 23, 2025</a>
+                            </div>
+                        </div>
+                        <!-- Post Content -->
+                        <div class="post-content">
+                            <div class="post-author">
+                                <a href="#"><img src="{{ url_for('static', filename='img/blog-img/avatar.avif') }}" alt=""></a>
+                            </div>
+                            <a href="#" class="headline">Dermatologie</a>
+                            <p>Mon enfant avait des boutons inquiétants. MED_IA a reconnu la l'eczema et m'a donné les bons réflexes pour éviter la surinfection. Plus besoin de se déplacer inutilement !"
+                                <br>- Aminata D., maman de 2 enfants</p>
+                            <a href="#" class="comments">+ de Commentaires</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Single Blog Area -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="single-blog-area mb-100">
+                        <!-- Post Thumbnail -->
+                        <div class="blog-post-thumbnail">
+                            <img src="{{ url_for('static', filename='img/blog-img/fievre.webp') }}" alt="">
+                            <!-- Post Date -->
+                            <div class="post-date">
+                                <a href="#">Mars 23, 2025</a>
+                            </div>
+                        </div>
+                        <!-- Post Content -->
+                        <div class="post-content">
+                            <div class="post-author">
+                                <a href="#"><img src="{{ url_for('static', filename='img/blog-img/avatar.avif') }}" alt=""></a>
+                            </div>
+                            <a href="#" class="headline">Fébriles</a>
+                            <p>"Fièvre à 40°C avec raideur de la nuque : MedLife a identifié un risque de méningite. MED_IA m'a dit que je devais immediatement consultez un medecin."
+                                <br>- Kévin P., 27 ans</p>
+                            <a href="#" class="comments">+ de Commentaires</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Blog Area End ***** -->
+
+    <!-- ***** Emergency Area Start ***** -->
+    <!--*** Emergency Area End ***** -->
+
+    <!-- ***** Footer Area Start ***** -->
+   {% endblock %}

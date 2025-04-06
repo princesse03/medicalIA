@@ -1,0 +1,574 @@
+import joblib
+from flask import Flask, render_template, request, jsonify
+import pandas as pd
+import numpy as np
+from termcolor import colored
+
+app = Flask(__name__)
+
+model = joblib.load('rf.pkl')
+
+import pandas as pd
+import joblib
+from termcolor import colored
+
+# Liste des maladies
+maladies = [
+    'Grippe', 'Rhume', 'Eczema', 'Asthme', 'Hyperthyroidie', 'Rhinite allergique',
+    'Troubles anxieux', 'Diabete', 'Gastro-entérite', 'Pancreatite', 'Polyarthrite rhumatoide',
+    'Depression', 'Cancer du foie', 'AVC', 'Infection urinaire', 'Cancer du rein', 'Migraine',
+    'Colite ulcereuse', 'Bronchite', 'Osteoporose', 'Pneumonie', 'Hypertension', 'Psoriasis',
+    'Maladie du foie', 'Maladie renale', 'Arthrose', 'Hypothyroidism', 'Maladie de Crohn',
+    'Maladie de Parkinson', "Maladie d'Alzheimer"
+]
+
+# Classification complète de gravité avec recommandations
+gravite_maladies = {
+    # Urgences absolues (nécessitent une intervention immédiate)
+    'AVC': {
+        'niveau': 'urgence absolue',
+        'conseils': [
+            "APPELER LE 15 IMMÉDIATEMENT",
+            "Ne pas donner à manger ou boire",
+            "Notez l'heure de début des symptômes"
+        ],
+        'couleur': 'red'
+    },
+    'Pancreatite': {
+        'niveau': 'urgence absolue',
+        'conseils': [
+            "Hospitalisation en urgence",
+            "Jeûne strict nécessaire",
+            "Traitement antalgique en urgence"
+        ],
+        'couleur': 'red'
+    },
+    'Pneumonie': {
+        'niveau': 'urgence',
+        'conseils': [
+            "Antibiothérapie urgente",
+            "Hospitalisation si détresse respiratoire",
+            "Surveillance constante de la saturation"
+        ],
+        'couleur': 'red'
+    },
+
+    # Maladies graves (nécessitent une consultation rapide)
+    'Asthme': {
+        'niveau': 'grave',
+        'conseils': [
+            "Bronchodilatateur immédiat",
+            "Consultation pneumologue sous 48h",
+            "Éviter les facteurs déclenchants"
+        ],
+        'couleur': 'yellow'
+    },
+    'Diabete': {
+        'niveau': 'grave',
+        'conseils': [
+            "Contrôle glycémique immédiat",
+            "Adaptation du traitement insulinique",
+            "Consultation endocrinologue sous 7 jours"
+        ],
+        'couleur': 'yellow'
+    },
+    'Hypertension': {
+        'niveau': 'grave',
+        'conseils': [
+            "Mesure tensionnelle répétée",
+            "Réduction stricte du sel",
+            "Consultation cardiologique sous 72h"
+        ],
+        'couleur': 'yellow'
+    },
+
+    # Maladies chroniques (prise en charge spécialisée)
+    'Cancer du foie': {
+        'niveau': 'chronique grave',
+        'conseils': [
+            "Consultation oncologique urgente",
+            "Bilan hépatique complet",
+            "Prise en charge multidisciplinaire"
+        ],
+        'couleur': 'magenta'
+    },
+    'Maladie de Parkinson': {
+        'niveau': 'chronique',
+        'conseils': [
+            "Adaptation du traitement neurologique",
+            "Kinésithérapie spécialisée",
+            "Consultation neurologique mensuelle"
+        ],
+        'couleur': 'magenta'
+    },
+    "Maladie d'Alzheimer": {
+        'niveau': 'chronique',
+        'conseils': [
+            "Évaluation gériatrique complète",
+            "Mise en place d'aides à domicile",
+            "Traitement spécifique à initier"
+        ],
+        'couleur': 'magenta'
+    },
+
+    # Maladies modérées (consultation sous 15 jours)
+    'Grippe': {
+        'niveau': 'modéré',
+        'conseils': [
+            "Repos 5-7 jours",
+            "Hydratation abondante",
+            "Antipyrétiques si fièvre > 38.5°C"
+        ],
+        'couleur': 'blue'
+    },
+    'Bronchite': {
+        'niveau': 'modéré',
+        'conseils': [
+            "Arrêt de travail si nécessaire",
+            "Antitussifs si toux sèche",
+            "Consultation si persistance > 10 jours"
+        ],
+        'couleur': 'blue'
+    },
+    'Infection urinaire': {
+        'niveau': 'modéré',
+        'conseils': [
+            "Antibiothérapie adaptée",
+            "Hydratation intensive",
+            "ECBU de contrôle"
+        ],
+        'couleur': 'blue'
+    },
+
+    # Maladies légères (autogestion possible)
+    'Rhume': {
+        'niveau': 'léger',
+        'conseils': [
+            "Lavages nasaux réguliers",
+            "Repos 2-3 jours",
+            "Pas d'antibiotiques nécessaires"
+        ],
+        'couleur': 'green'
+    },
+    'Eczema': {
+        'niveau': 'léger',
+        'conseils': [
+            "Emollients quotidiens",
+            "Corticoïdes locaux si poussée",
+            "Éviction des allergènes"
+        ],
+        'couleur': 'green'
+    },
+    'Migraine': {
+        'niveau': 'léger',
+        'conseils': [
+            "Triptans si diagnostiqué",
+            "Repos dans le calme et l'obscurité",
+            "Tenir un agenda des crises"
+        ],
+        'couleur': 'green'
+    },
+
+    # Valeur par défaut pour les maladies non spécifiées
+    **{
+        maladie: {
+            'niveau': 'à évaluer',
+            'conseils': [
+                "Consultation médicale recommandée",
+                "Bilan complémentaire nécessaire",
+                "Surveillance des symptômes"
+            ],
+            'couleur': 'cyan'
+        }
+        for maladie in maladies if maladie not in [
+            'AVC', 'Pancreatite', 'Pneumonie', 'Asthme', 'Diabete', 'Hypertension',
+            'Cancer du foie', 'Maladie de Parkinson', "Maladie d'Alzheimer",
+            'Grippe', 'Bronchite', 'Infection urinaire', 'Rhume', 'Eczema', 'Migraine'
+        ]
+    }
+}
+
+
+def preparer_donnees(reponses):
+    """Transforme les réponses utilisateur en données compatibles avec le modèle"""
+    try:
+        # Chargement des encodeurs
+        gender_encoder = joblib.load('gender_encoder.pkl')
+        bp_encoder = joblib.load('bp_encoder.pkl')
+        chol_encoder = joblib.load('chol_encoder.pkl')
+
+        # Normalisation des entrées
+        genre_norm = reponses['Genre'].capitalize()
+        tension_norm = reponses['Tension arterielle'].capitalize().replace('é', 'e').replace('ée', 'e')
+        chol_norm = reponses['Niveau de cholesterol'].capitalize().replace('é', 'e')
+
+        # Gestion des valeurs inconnues
+        if genre_norm not in gender_encoder.classes_:
+            genre_norm = 'Homme'  # Valeur par défaut
+        if tension_norm not in bp_encoder.classes_:
+            tension_norm = 'Normal'
+        if chol_norm not in chol_encoder.classes_:
+            chol_norm = 'Normal'
+
+        # Création du DataFrame
+        data = {
+            'Fievre': int(reponses.get('Fievre', 0)),
+            'Toux': int(reponses.get('Toux', 0)),
+            'Fatigue': int(reponses.get('Fatigue', 0)),
+            'Difficulte respiratoire': int(reponses.get('Difficulte respiratoire', 0)),
+            'Age': int(reponses.get('Age', 30)),  # Valeur par défaut
+            'Genre': gender_encoder.transform([genre_norm])[0],
+            'Tension arterielle': bp_encoder.transform([tension_norm])[0],
+            'Niveau de cholesterol': chol_encoder.transform([chol_norm])[0]
+        }
+
+        return pd.DataFrame([data])
+
+    except Exception as e:
+        print(f"Erreur lors de la préparation des données: {str(e)}")
+        raise
+
+
+def generer_recommandation(maladie, probabilite):
+    """Génère des recommandations médicales basées sur la maladie prédite et la probabilité"""
+
+    # Seuil de confiance minimal
+    if probabilite < 0.6:
+        return {
+            'urgence': "incertain",
+            'message': "⚠️ Résultat peu certain - Consultez un médecin pour confirmation",
+            'conseils': ["Repos en attendant la consultation", "Surveillance des symptômes"]
+        }
+
+    # Récupération du niveau de gravité (avec valeur par défaut 'modéré')
+    niveau_gravite = gravite_maladies.get(maladie, {}).get('niveau', 'modéré')
+
+    # Structure de base pour les recommandations
+    recommandation = {
+        'maladie': maladie,
+        'probabilite': probabilite,
+        'gravite': niveau_gravite
+    }
+
+    # Messages prioritaires selon la gravité
+    if niveau_gravite == 'urgence absolue':
+        recommandation.update({
+            'urgence': "immédiate",
+            'message': "🔴 URGENCE VITALE: Appelez le 15 immédiatement",
+            'conseils': gravite_maladies.get(maladie, {}).get('conseils', [
+                "Ne pas prendre de médicaments sans avis médical",
+                "Préparer les antécédents médicaux pour les secours"
+            ])
+        })
+    elif niveau_gravite == 'grave':
+        recommandation.update({
+            'urgence': "élevée",
+            'message': "🟠 URGENCE: Consultez aux urgences dans l'heure",
+            'conseils': gravite_maladies.get(maladie, {}).get('conseils', [
+                "Arrêt de toute activité physique",
+                "Surveillance constante des symptômes"
+            ])
+        })
+    elif niveau_gravite == 'chronique grave':
+        recommandation.update({
+            'urgence': "spécialisée",
+            'message': "🟡 CONSULTATION SPÉCIALISÉE: Prise en charge urgente nécessaire",
+            'conseils': gravite_maladies.get(maladie, {}).get('conseils', [
+                "Contacter votre spécialiste habituel",
+                "Ne pas interrompre les traitements en cours"
+            ])
+        })
+    elif niveau_gravite == 'modéré':
+        recommandation.update({
+            'urgence': "consultation",
+            'message': "🔵 CONSULTATION: Prenez RDV sous 48h",
+            'conseils': gravite_maladies.get(maladie, {}).get('conseils', [
+                "Repos jusqu'à la consultation",
+                "Antalgiques si nécessaire (paracétamol)"
+            ])
+        })
+    elif niveau_gravite == 'léger':
+        recommandation.update({
+            'urgence': "ambulatoire",
+            'message': "🟢 SOINS À DOMICILE: Traitement symptomatique possible",
+            'conseils': gravite_maladies.get(maladie, {}).get('conseils', [
+                "Hydratation abondante",
+                "Surveillance de l'évolution"
+            ])
+        })
+    else:  # Cas par défaut
+        recommandation.update({
+            'urgence': "à évaluer",
+            'message': "ℹ️ CONSULTATION RECOMMANDÉE: Évaluation médicale nécessaire",
+            'conseils': gravite_maladies.get(maladie, {}).get('conseils', [
+                "Tenir un journal des symptômes",
+                "Consulter si aggravation"
+            ])
+        })
+
+    # Ajout des conseils spécifiques en complément
+    conseils_specifiques = {
+        'Asthme': ["Vérifiez la date de péremption de votre bronchodilatateur"],
+        'Diabete': ["Contrôle glycémique avant chaque repas"],
+        'Hypertension': ["Mesure tensionnelle matin et soir"],
+        'Grippe': ["Isolement recommandé pendant 5 jours"],
+        'Pneumonie': ["Surveillance de la température 3x/jour"],
+        # ... autres conseils spécifiques
+    }
+
+    if maladie in conseils_specifiques:
+        recommandation['conseils'].extend(conseils_specifiques[maladie])
+
+    return recommandation
+
+
+def afficher_recommandation(recommandation):
+    """Affiche de manière structurée les recommandations"""
+
+    print(f"\n=== RECOMMANDATIONS POUR {recommandation['maladie'].upper()} ===")
+    print(f"Probabilité: {recommandation['probabilite'] * 100:.1f}%")
+    print(f"Niveau de gravité: {recommandation['gravite'].upper()}")
+
+    # Affichage coloré selon l'urgence
+    if recommandation['urgence'] in ["immédiate", "élevée"]:
+        print(colored(recommandation['message'], 'red', attrs=['bold']))
+    elif recommandation['urgence'] == "spécialisée":
+        print(colored(recommandation['message'], 'yellow', attrs=['bold']))
+    else:
+        print(colored(recommandation['message'], 'green'))
+
+    print("\nCONSEILS MÉDICAUX:")
+    for i, conseil in enumerate(recommandation['conseils'], 1):
+        print(f"{i}. {conseil}")
+
+    # Message complémentaire selon la gravité
+    if recommandation['urgence'] == "immédiate":
+        print(colored("\nNE TARDEZ PAS - COMPOSEZ LE 15 IMMÉDIATEMENT", 'red', attrs=['bold', 'blink']))
+    elif recommandation['urgence'] == "élevée":
+        print(colored("\nDéplacez-vous aux urgences les plus proches", 'yellow', attrs=['bold']))
+
+
+def diagnostic_complet(model, input_data):
+    """
+    Effectue un diagnostic médical complet avec :
+    - Prédiction principale
+    - Top 5 des diagnostics possibles
+    - Recommandations adaptées
+    - Conseils spécifiques
+    """
+
+    # Dictionnaire de correspondance index -> maladie
+    idx_to_maladie = {i: maladie for i, maladie in enumerate(maladies)}
+
+    try:
+        # Prédiction et probabilités
+        probas = model.predict_proba(input_data)[0]
+        top_5_idx = np.argsort(probas)[-5:][::-1]  # Indices des 5 meilleures prédictions
+
+        # Diagnostic principal
+        diagnostic_principal = idx_to_maladie[model.predict(input_data)[0]]
+        confiance_principale = max(probas)
+
+        # Structure des résultats
+        results = {
+            'diagnostic': diagnostic_principal,
+            'confiance': float(confiance_principale),
+            'top_5': [(idx_to_maladie[idx], float(probas[idx])) for idx in top_5_idx],
+            'recommandation': None,
+            'conseils': None,
+            'gravite': None  # Initialisation ajoutée
+        }
+
+        # Seuil de confiance ajustable
+        seuil_confiance = 0.6  # 60% de confiance minimum
+
+        if confiance_principale < seuil_confiance:
+            results['diagnostic'] = 'Bonne santé'
+            results['confiance'] = 1 - confiance_principale
+
+        # Génération des recommandations
+        reco = generer_recommandation(results['diagnostic'], results['confiance'])
+        results['recommandation'] = reco['message']
+        results['conseils'] = reco['conseils']
+        results['gravite'] = reco.get('urgence', 'à évaluer')  # Modification pour plus de robustesse
+
+        return results
+
+    except Exception as e:
+        print(colored(f"Erreur lors du diagnostic : {str(e)}", 'red'))
+        return {
+            'erreur': str(e),
+            'diagnostic': 'Indéterminé',
+            'confiance': 0.0,
+            'gravite': 'inconnue'  # Valeur par défaut ajoutée
+        }
+
+
+def diagnostic_complet(model, input_data):
+    """
+    Effectue un diagnostic médical complet avec :
+    - Prédiction principale
+    - Top 5 des diagnostics possibles
+    - Recommandations adaptées
+    - Conseils spécifiques
+    """
+
+    # Dictionnaire de correspondance index -> maladie
+    idx_to_maladie = {i: maladie for i, maladie in enumerate(maladies)}
+
+    try:
+        # Prédiction et probabilités
+        probas = model.predict_proba(input_data)[0]
+        top_5_idx = np.argsort(probas)[-5:][::-1]  # Indices des 5 meilleures prédictions
+
+        # Diagnostic principal
+        diagnostic_principal = idx_to_maladie[model.predict(input_data)[0]]
+        confiance_principale = max(probas)
+
+        # Structure des résultats
+        results = {
+            'diagnostic': diagnostic_principal,
+            'confiance': float(confiance_principale),
+            'top_5': [(idx_to_maladie[idx], float(probas[idx])) for idx in top_5_idx],
+            'recommandation': None,
+            'conseils': None,
+            'gravite': None  # Initialisation ajoutée
+        }
+
+        # Seuil de confiance ajustable
+        seuil_confiance = 0.6  # 60% de confiance minimum
+
+        if confiance_principale < seuil_confiance:
+            results['diagnostic'] = 'Bonne santé'
+            results['confiance'] = 1 - confiance_principale
+
+        # Génération des recommandations
+        reco = generer_recommandation(results['diagnostic'], results['confiance'])
+        results['recommandation'] = reco['message']
+        results['conseils'] = reco['conseils']
+        results['gravite'] = reco.get('urgence', 'à évaluer')  # Modification pour plus de robustesse
+
+        return results
+
+    except Exception as e:
+        print(colored(f"Erreur lors du diagnostic : {str(e)}", 'red'))
+        return {
+            'erreur': str(e),
+            'diagnostic': 'Indéterminé',
+            'confiance': 0.0,
+            'gravite': 'inconnue'  # Valeur par défaut ajoutée
+        }
+
+
+def afficher_diagnostic(results):
+    """Affiche les résultats du diagnostic de manière claire et structurée"""
+
+    print("\n" + "=" * 50)
+    print(colored(" RÉSULTATS DU DIAGNOSTIC MÉDICAL ", 'cyan', attrs=['bold']))
+    print("=" * 50)
+
+    # Gestion des erreurs
+    if 'erreur' in results:
+        print(colored("\n❌ ERREUR DE DIAGNOSTIC", 'red'))
+        print(f"Message : {results['erreur']}")
+        return
+
+    # Affichage du diagnostic principal
+    if results['diagnostic'] == 'Bonne santé':
+        print(colored("\n🎉 DIAGNOSTIC : BONNE SANTÉ", 'green', attrs=['bold']))
+        print(f"Confiance du modèle : {results['confiance'] * 100:.1f}%")
+    else:
+        print(f"\n🔍 DIAGNOSTIC PRINCIPAL : {colored(results['diagnostic'], 'yellow', attrs=['bold'])}")
+        print(f"Confiance du modèle : {results['confiance'] * 100:.1f}%")
+        # Ajout d'une vérification pour 'gravite'
+        if 'gravite' in results:
+            print(f"Niveau de gravité : {results['gravite'].upper()}")
+
+    # Affichage des recommandations avec vérification
+    if 'recommandation' in results and results['recommandation']:
+        print(colored("\n💡 RECOMMANDATION :", 'blue'))
+        if "URGENCE" in results['recommandation']:
+            print(colored(results['recommandation'], 'red', attrs=['bold']))
+        else:
+            print(results['recommandation'])
+
+    # Affichage des conseils avec vérification
+    if 'conseils' in results and results['conseils']:
+        print(colored("\n📌 CONSEILS MÉDICAUX :", 'blue'))
+        for i, conseil in enumerate(results['conseils'], 1):
+            print(f"{i}. {conseil}")
+
+    # Affichage du top 5 avec vérification
+    if 'top_5' in results and len(results['top_5']) > 1:
+        print(colored("\n🔎 TOP 5 DES DIAGNOSTICS POSSIBLES :", 'magenta'))
+        for maladie, proba in results['top_5']:
+            print(f"- {maladie} ({proba * 100:.1f}%)")
+
+    print("\n" + "=" * 50)
+
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+
+@app.route('/about-us')
+def apropos():
+    return render_template("about-us.html")
+
+
+@app.route('/blog')
+def conseil():
+    return render_template("blog.html")
+
+
+@app.route('/contact')
+def contact():
+    return render_template("contact.html")
+
+
+@app.route('/test', methods=["POST", "GET"])
+def testons():
+    #resultat_diagnostic = None
+    if request.method == "POST":
+
+        #Récupération des donnees du formulaire
+        fievre = int(request.form.get("fievre", 0))
+        toux = int(request.form.get("toux", 0))
+        fatigue = int(request.form.get("fatigue", 0))
+        difficulte_respiratoire = int(request.form.get("difficulte_respiratoire", 0))
+        age = int(request.form.get("Age"))
+        Genre = request.form.get("Genre")
+        tension_arterielle = request.form.get("tension_arterielle")
+        niveau_cholesterol = request.form.get("niveau_de_cholesterol")
+
+        # Analyse des symptômes
+        message = "Votre état semble normal."
+        if fievre or toux or fatigue or difficulte_respiratoire:
+            message = "Vous présentez des symptômes. Consultez un médecin si votre état s’aggrave."
+        if difficulte_respiratoire or (age > 60 and (tension_arterielle == "élevé" or niveau_cholesterol == "élevé")):
+            message = "Consultez un médecin immédiatement !"""
+
+        reponses = request.form.to_dict()
+
+        donnees_utilisateur = preparer_donnees(reponses)
+        donnees_utilisateur.columns = donnees_utilisateur.columns.str.replace(' ', '_')
+
+        resultat = diagnostic_complet(model, donnees_utilisateur)
+
+        return render_template('test.html', resultat = resultat)
+
+
+
+
+
+    return render_template("test.html")
+
+
+@app.route('/service')
+def board():
+    return render_template("services.html")
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
