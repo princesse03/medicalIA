@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion - MED_IA</title>
+  <style>
+    :root {
+      --primary-dark: #0A1A2F;
+      --secondary-dark: #1E293B;
+      --accent-teal: #16A085;
+      --accent-teal-light: #1ABC9C;
+      --text-light: #ECF0F1;
+      --text-muted: #BDC3C7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background-color: var(--primary-dark);
+      color: var(--text-light);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: radial-gradient(circle at 10% 20%, rgba(22, 160, 133, 0.1) 0%, rgba(10, 26, 47, 1) 90%);
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 400px;
+      background-color: var(--secondary-dark);
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--accent-teal);
+      text-align: center;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      background-color: var(--accent-teal);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 25px;
+      color: white;
+      font-size: 30px;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 15px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--accent-teal);
+      border-radius: 8px;
+      color: var(--text-light);
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent-teal-light);
+      box-shadow: 0 0 0 2px rgba(26, 188, 156, 0.2);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background-color: var(--accent-teal);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+
+    .btn:hover {
+      background-color: var(--accent-teal-light);
+      transform: translateY(-2px);
+    }
+
+    .error-message {
+      color: #E74C3C;
+      margin-top: 20px;
+      display: none;
+    }
+
+    .signup-link {
+      margin-top: 25px;
+      color: var(--text-muted);
+    }
+
+    .signup-link a {
+      color: var(--accent-teal);
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    .signup-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 30px 20px;
+        margin: 0 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">
+      <i class="fas fa-user-md"></i>
+    </div>
+    <h1>Connexion MED_IA</h1>
+
+    <form id="loginForm">
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" required placeholder="votre@email.com ici">
+      </div>
+
+      <div class="input-group">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" required placeholder="votre mot de passe ici">
+      </div>
+
+      <button type="submit" class="btn">Se connecter</button>
+
+      <div class="error-message" id="errorMessage">
+        Identifiants incorrects. Veuillez réessayer.
+      </div>
+    </form>
+
+    <div class="signup-link">
+      Pas encore inscrit ? <a href="inscription.html" id="signupLink">Créer un compte</a>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <script>
+    const validUsers = {
+      'admin@med-ia.com': 'demo123',
+      'user@med-ia.com': 'demo123'
+    };
+
+    function authenticateUser(email, password) {
+      return validUsers[email] === password;
+    }
+
+    function isAdmin(email) {
+      return email === 'admin@med-ia.com';
+    }
+
+    function showError() {
+      const errorElement = document.getElementById('errorMessage');
+      errorElement.style.display = 'block';
+      setTimeout(() => {
+        errorElement.style.display = 'none';
+      }, 3000);
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (authenticateUser(email, password)) {
+        if (isAdmin(email)) {
+          window.location.href = 'services.html';
+        } else {
+          window.location.href = 'test.html';
+        }
+      } else {
+        showError();
+      }
+    });
+
+    document.getElementById('signupLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      alert("Fonctionnalité d'inscription à implémenter");
+    });
+  </script>
+</body>
+</html>
