@@ -556,10 +556,13 @@ def conseil():
     return render_template("blog.html")
 
 
+@app.route('/loginadm')
+def login():
+    return render_template("loginadm.html")
+
 @app.route('/contact')
 def contact():
     return render_template("contact.html")
-
 
 @app.route('/test', methods=['GET', 'POST'])
 def testons():
@@ -669,8 +672,6 @@ def board():
 if __name__ == "__main__":
     app.run(debug=True)
 
-
-import logging
 
 # Configuration du logging
 logging.basicConfig(filename='app.py', level=logging.ERROR)

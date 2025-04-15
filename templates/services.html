@@ -3,417 +3,761 @@
 <head>
   <meta charset="UTF-8">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <title>Dashboard MED_IA</title>
   <style>
-    :root {
-      /* Couleurs de base */
-      --primary-dark: #0A1A2F;
-      --secondary-dark: #1E293B;
-      --accent-teal: #16A085;
-      --accent-teal-light: #1ABC9C;
+    /* ... (conserver tous les styles existants) ... */
+     :root {
+  /* Couleurs de base */
+  --primary-dark: #0A1A2F;
+  --secondary-dark: #1E293B;
+  --accent-teal: #16A085;
+  --accent-teal-light: #1ABC9C;
 
-      /* Couleurs sémantiques */
-      --health-safe: #2ECC71;
-      --health-warning: #F39C12;
-      --health-danger: #E74C3C;
-      --health-info: #3498DB;
+  /* Couleurs sémantiques */
+  --health-safe: #2ECC71;
+  --health-warning: #F39C12;
+  --health-danger: #E74C3C;
+  --health-info: #3498DB;
 
-      /* Texte */
-      --text-light: #ECF0F1;
-      --text-muted: #BDC3C7;
-    }
+  /* Texte */
+  --text-light: #ECF0F1;
+  --text-muted: #BDC3C7;
+}
 
-    * {
-      box-sizing: border-box;
-    }
+* {
+  box-sizing: border-box;
+}
 
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 220px 1fr 320px;
+  overflow: hidden;
+  background-color: var(--primary-dark);
+  color: var(--text-light);
+}
+
+aside {
+  background: linear-gradient(180deg, var(--accent-teal), var(--primary-dark));
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--accent-teal-light);
+}
+.bas {
+  margin-top: auto; /* Pousse la section vers le bas */
+  padding-top: 20px;
+  border-top: 1px solid rgba(22, 160, 133, 0.3); /* Ligne de séparation discrète */
+}
+
+.bas p {
+  margin: 12px 0;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--text-light);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bas p:hover {
+  background-color: rgba(22, 160, 133, 0.2); /* Effet hover subtil */
+  transform: translateX(5px);
+}
+
+.bas p::before {
+  font-size: 1.1em;
+}
+
+/* Animation pour les icônes */
+.bas p:hover::before {
+  animation: bounce 0.5s;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-3px); }
+}
+
+/* Responsive pour petits écrans */
+@media (max-height: 700px) {
+  .bas {
+    padding-top: 10px;
+  }
+  .bas p {
+    margin: 8px 0;
+    padding: 6px 10px;
+    font-size: 0.9em;
+  }
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.content {
+  padding: 20px;
+  background-color: var(--secondary-dark);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: min-content;
+  gap: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.header {
+  grid-column: span 2;
+  background: linear-gradient(90deg, var(--accent-teal), var(--primary-dark));
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.card {
+  background-color: var(--secondary-dark);
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+  border-left: 4px solid var(--accent-teal);
+}
+
+.card h3 {
+  margin-top: 0;
+  color: var(--health-safe);
+  border-bottom: 1px solid var(--accent-teal);
+  padding-bottom: 8px;
+}
+
+.card1 {
+  background: linear-gradient(135deg, #2980B9, #2C3E50);
+  border-left: 4px solid var(--health-info);
+}
+
+.card2 {
+  background: linear-gradient(135deg, var(--health-safe), var(--accent-teal));
+  border-left: 4px solid var(--health-safe);
+}
+
+.chart-container {
+  position: relative;
+  height: 250px;
+  width: 100%;
+  margin-top: 15px;
+}
+
+/* Styles pour les cases à cocher */
+.checkbox-group {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.checkbox-option {
+  display: none;
+}
+
+.checkbox-label {
+  padding: 8px 15px;
+  background-color: var(--secondary-dark);
+  border: 1px solid var(--accent-teal);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-label:before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--accent-teal);
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.checkbox-option:checked + .checkbox-label {
+  background-color: var(--accent-teal);
+  color: white;
+  border-color: var(--accent-teal-light);
+}
+
+.checkbox-option:checked + .checkbox-label:before {
+  background-color: white;
+  border-color: white;
+}
+
+
+    .chatbot-column {
+      width: 320px;
+      background-color: var(--secondary-dark);
+      padding: 20px;
+      border-left: 2px solid var(--accent-teal);
+      display: flex;
+      flex-direction: column;
       height: 100vh;
-      display: grid;
-      grid-template-columns: 220px 1fr 320px;
-      overflow: hidden;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--accent-teal);
+    }
+
+    .chat-header h3 {
+      margin: 0;
+      color: var(--accent-teal);
+    }
+
+    .chat-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--accent-teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+
+    .message {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .message-avatar {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--health-info);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 16px;
+    }
+
+    .message-content {
+      flex: 1;
+      background-color: var(--primary-dark);
+      padding: 12px;
+      border-radius: 12px;
+      position: relative;
+    }
+
+    .message-user {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: var(--health-safe);
+    }
+
+    .message-text {
+      color: var(--text-light);
+      margin-bottom: 8px;
+    }
+
+    .message-time {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    .message-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .message-action {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      transition: color 0.3s;
+      padding: 4px;
+    }
+
+    .message-action:hover {
+      color: var(--accent-teal);
+    }
+
+    .chat-input {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid var(--accent-teal);
+      border-radius: 20px;
       background-color: var(--primary-dark);
       color: var(--text-light);
     }
 
-    aside {
-      background: linear-gradient(180deg, var(--accent-teal), var(--primary-dark));
-      color: white;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      border-right: 1px solid var(--accent-teal-light);
-    }
-
-    .main-content {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .content {
-      padding: 20px;
-      background-color: var(--secondary-dark);
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      grid-auto-rows: min-content;
-      gap: 20px;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .header {
-      grid-column: span 2;
-      background: linear-gradient(90deg, var(--accent-teal), var(--primary-dark));
-      color: white;
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-
-    .card {
-      background-color: var(--secondary-dark);
-      padding: 18px;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-      border-left: 4px solid var(--accent-teal);
-    }
-
-    .card h3 {
-      margin-top: 0;
-      color: var(--health-safe);
-      border-bottom: 1px solid var(--accent-teal);
-      padding-bottom: 8px;
-    }
-
-    .card1 {
-      background: linear-gradient(135deg, #2980B9, #2C3E50);
-      border-left: 4px solid var(--health-info);
-    }
-
-    .card2 {
-      background: linear-gradient(135deg, var(--health-safe), var(--accent-teal));
-      border-left: 4px solid var(--health-safe);
-    }
-
-    .chart-container {
-      position: relative;
-      height: 250px;
-      width: 100%;
-      margin-top: 15px;
-    }
-
-    /* Styles pour les cases à cocher */
-    .checkbox-group {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-    }
-
-    .checkbox-option {
-      display: none;
-    }
-
-    .checkbox-label {
-      padding: 8px 15px;
-      background-color: var(--secondary-dark);
-      border: 1px solid var(--accent-teal);
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .checkbox-label:before {
-      content: "";
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid var(--accent-teal);
-      border-radius: 4px;
-      transition: all 0.3s;
-    }
-
-    .checkbox-option:checked + .checkbox-label {
+    .chat-input button {
       background-color: var(--accent-teal);
       color: white;
-      border-color: var(--accent-teal-light);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.3s;
     }
 
-    .checkbox-option:checked + .checkbox-label:before {
-      background-color: white;
-      border-color: white;
+    .chat-input button:hover {
+      background-color: var(--accent-teal-light);
     }
 
-    /* Styles pour le chatbot... */
+    /* Custom scrollbar */
+    .chat-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+      background: var(--secondary-dark);
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: var(--accent-teal);
+      border-radius: 3px;
+    }
   </style>
 </head>
 <body>
 
+  <!-- ... (conserver le aside et main-content existants) ... -->
   <aside>
-    <h2>👤 Admin MED_IA</h2>
-    <p>📄 Pages</p>
-    <p>ℹ️ Infos</p>
-    <p>👥 Utilisateurs</p>
-    <hr>
-    <p>🔐 Reconnexion</p>
+  <h2>👤 Admin MED_IA</h2>
+  <p>📄 Pages</p>
+  <p>ℹ️ Infos</p>
+  <p>👥 Utilisateurs</p>
+  <hr>
+   <div class="bas">
+     <p>🔐 Reconnexion</p>
     <p>📝 Infos Admin</p>
+   </div>
+
+
   </aside>
 
-  <div class="main-content">
-    <div class="content">
-      <div class="header">🩺 TABLEAU DE BORD - MED_IA</div>
+<div class="main-content">
+  <div class="content">
+    <div class="header">🩺 TABLEAU DE BORD - MED_IA</div>
 
-      <div class="card card1">👀 Nombre de visites : <strong>2450</strong></div>
-      <div class="card card2">🧪 Maladies prédites : <strong>126</strong></div>
+    <div class="card card1">👀 Nombre de visites : <strong>2450</strong></div>
+    <div class="card card2">🧪 Maladies prédites : <strong>126</strong></div>
 
-      <div class="card" style="grid-column: span 2;">
-        <h3>📊 Évolution des prédictions</h3>
-        <div class="checkbox-group">
-          <input type="checkbox" id="dayOption" class="checkbox-option" checked>
-          <label for="dayOption" class="checkbox-label">Jour</label>
+    <div class="card" style="grid-column: span 2;">
+      <h3>📊 Évolution des prédictions</h3>
+      <div class="checkbox-group">
+        <input type="checkbox" id="dayOption" class="checkbox-option" checked>
+        <label for="dayOption" class="checkbox-label">Jour</label>
 
-          <input type="checkbox" id="monthOption" class="checkbox-option">
-          <label for="monthOption" class="checkbox-label">Mois</label>
+        <input type="checkbox" id="monthOption" class="checkbox-option">
+        <label for="monthOption" class="checkbox-label">Mois</label>
 
-          <input type="checkbox" id="yearOption" class="checkbox-option">
-          <label for="yearOption" class="checkbox-label">Année</label>
-        </div>
-        <div class="chart-container">
-          <canvas id="evolutionChart"></canvas>
-        </div>
+        <input type="checkbox" id="yearOption" class="checkbox-option">
+        <label for="yearOption" class="checkbox-label">Année</label>
       </div>
-
-      <div class="card">
-        <h3>✅ Prédictions Correctes</h3>
-        <div class="chart-container">
-          <canvas id="correctChart"></canvas>
-        </div>
+      <div class="chart-container">
+        <canvas id="evolutionChart"></canvas>
       </div>
+    </div>
 
-      <div class="card">
-        <h3>❌ Faux Négatifs</h3>
-        <div class="chart-container">
-          <canvas id="fauxChart"></canvas>
-        </div>
+    <div class="card">
+      <h3>✅ Prédictions Correctes</h3>
+      <div class="chart-container">
+        <canvas id="correctChart"></canvas>
       </div>
+    </div>
 
-      <div class="card" style="grid-column: span 2;">
-        <h3>📋 Liste des maladies détectées</h3>
-        <ul>
-          <li>Grippe (32 cas)</li>
-          <li>Diabète (28 cas)</li>
-          <li>Covid-19 (24 cas)</li>
-          <li>Hypertension (18 cas)</li>
-          <li>Asthme (12 cas)</li>
-        </ul>
+    <div class="card">
+      <h3>❌ Faux Négatifs</h3>
+      <div class="chart-container">
+        <canvas id="fauxChart"></canvas>
       </div>
+    </div>
+
+    <div class="card" style="grid-column: span 2;">
+      <h3>📋 Liste des maladies détectées</h3>
+      <ul>
+        <li>Grippe (32 cas)</li>
+        <li>Diabète (28 cas)</li>
+        <li>Covid-19 (24 cas)</li>
+        <li>Hypertension (18 cas)</li>
+        <li>Asthme (12 cas)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+  <div class="chatbot-column">
+    <div class="chat-header">
+      <div class="chat-avatar">
+        <i class="fas fa-robot"></i>
+      </div>
+      <h3>Chatbot MED_IA</h3>
+    </div>
+
+    <div class="chat-messages" id="chatbot-messages">
+      <!-- Messages will be inserted here by JavaScript -->
+    </div>
+
+    <div class="chat-input">
+      <input type="text" placeholder="Écrivez votre message..." id="chat-input">
+      <button id="send-message"><i class="fas fa-paper-plane"></i></button>
     </div>
   </div>
 
-  <div class="chatbot-column">
-    <!-- Contenu du chatbot... -->
-  </div>
-
   <script>
+    // ... (conserver le code des graphiques existant) ...
     // Données pour les graphiques
-    const dailyData = [30, 45, 50, 40, 60, 70, 90];
-    const monthlyData = [450, 620, 580, 710, 690, 800];
-    const yearlyData = [5200, 6800, 7500, 8200];
+const dailyData = [30, 45, 50, 40, 60, 70, 90];
+const monthlyData = [450, 620, 580, 710, 690, 800];
+const yearlyData = [5200, 6800, 7500, 8200];
 
-    // 1. Graphique d'évolution (Line Chart)
-    const evolutionCtx = document.getElementById('evolutionChart').getContext('2d');
-    const evolutionChart = new Chart(evolutionCtx, {
-      type: 'line',
-      data: {
-        labels: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
-        datasets: [{
-          label: 'Prédictions',
-          data: dailyData,
-          borderColor: '#1ABC9C',
-          backgroundColor: 'rgba(26, 188, 156, 0.2)',
-          tension: 0.4,
-          fill: true,
-          pointBackgroundColor: '#fff',
-          pointBorderColor: '#1ABC9C'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: {
-              color: '#ECF0F1',
-              font: {
-                size: 12
-              }
-            }
-          },
-          tooltip: {
-            mode: 'index',
-            intersect: false
+// 1. Graphique d'évolution (Line Chart)
+const evolutionCtx = document.getElementById('evolutionChart').getContext('2d');
+const evolutionChart = new Chart(evolutionCtx, {
+  type: 'line',
+  data: {
+    labels: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+    datasets: [{
+      label: 'Prédictions',
+      data: dailyData,
+      borderColor: '#1ABC9C',
+      backgroundColor: 'rgba(26, 188, 156, 0.2)',
+      tension: 0.4,
+      fill: true,
+      pointBackgroundColor: '#fff',
+      pointBorderColor: '#1ABC9C'
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: '#ECF0F1',
+          font: {
+            size: 12
           }
+        }
+      },
+      tooltip: {
+        mode: 'index',
+        intersect: false
+      }
+    },
+    scales: {
+      x: {
+        grid: {
+          color: 'rgba(255, 255, 255, 0.1)'
         },
-        scales: {
-          x: {
-            grid: {
-              color: 'rgba(255, 255, 255, 0.1)'
-            },
-            ticks: {
-              color: '#BDC3C7'
-            }
-          },
-          y: {
-            grid: {
-              color: 'rgba(255, 255, 255, 0.1)'
-            },
-            ticks: {
-              color: '#BDC3C7'
-            }
-          }
+        ticks: {
+          color: '#BDC3C7'
         }
-      }
-    });
-
-    // 2. Graphique des prédictions correctes (Doughnut)
-    const correctCtx = document.getElementById('correctChart').getContext('2d');
-    const correctChart = new Chart(correctCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Correctes', 'Incorrectes', 'Indéterminées'],
-        datasets: [{
-          data: [78, 15, 7],
-          backgroundColor: [
-            '#2ECC71',
-            '#E74C3C',
-            '#F39C12'
-          ],
-          borderWidth: 0
-        }]
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '70%',
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              color: '#ECF0F1',
-              padding: 20,
-              font: {
-                size: 12
-              }
-            }
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                return `${context.label}: ${context.raw}%`;
-              }
-            }
-          }
-        }
-      }
-    });
-
-    // 3. Graphique des faux négatifs (Bar Chart)
-    const fauxCtx = document.getElementById('fauxChart').getContext('2d');
-    const fauxChart = new Chart(fauxCtx, {
-      type: 'bar',
-      data: {
-        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
-        datasets: [{
-          label: 'Faux négatifs',
-          data: [3, 5, 2, 4, 1, 2],
-          backgroundColor: '#F39C12',
-          borderRadius: 6,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                return `Faux négatifs: ${context.raw}`;
-              }
-            }
-          }
+      y: {
+        grid: {
+          color: 'rgba(255, 255, 255, 0.1)'
         },
-        scales: {
-          x: {
-            grid: {
-              display: false
-            },
-            ticks: {
-              color: '#BDC3C7'
-            }
-          },
-          y: {
-            grid: {
-              color: 'rgba(255, 255, 255, 0.1)'
-            },
-            ticks: {
-              color: '#BDC3C7',
-              stepSize: 1
-            }
+        ticks: {
+          color: '#BDC3C7'
+        }
+      }
+    }
+  }
+});
+
+// 2. Graphique des prédictions correctes (Doughnut)
+const correctCtx = document.getElementById('correctChart').getContext('2d');
+const correctChart = new Chart(correctCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Correctes', 'Incorrectes', 'Indéterminées'],
+    datasets: [{
+      data: [78, 15, 7],
+      backgroundColor: [
+        '#2ECC71',
+        '#E74C3C',
+        '#F39C12'
+      ],
+      borderWidth: 0
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '70%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          color: '#ECF0F1',
+          padding: 20,
+          font: {
+            size: 12
+          }
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return `${context.label}: ${context.raw}%`;
           }
         }
       }
-    });
+    }
+  }
+});
 
-    // Gestion du changement de période avec cases à cocher
-    const checkboxes = document.querySelectorAll('.checkbox-option');
-
-    checkboxes.forEach(checkbox => {
-      checkbox.addEventListener('change', function() {
-        // Décocher les autres cases
-        if (this.checked) {
-          checkboxes.forEach(cb => {
-            if (cb !== this) cb.checked = false;
-          });
-        } else {
-          // Forcer au moins une case cochée
-          this.checked = true;
-          return;
+// 3. Graphique des faux négatifs (Bar Chart)
+const fauxCtx = document.getElementById('fauxChart').getContext('2d');
+const fauxChart = new Chart(fauxCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
+    datasets: [{
+      label: 'Faux négatifs',
+      data: [3, 5, 2, 4, 1, 2],
+      backgroundColor: '#F39C12',
+      borderRadius: 6,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return `Faux négatifs: ${context.raw}`;
+          }
         }
-
-        let labels, data;
-
-        if (this.id === 'monthOption') {
-          labels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'];
-          data = monthlyData;
-        } else if (this.id === 'yearOption') {
-          labels = ['2020', '2021', '2022', '2023'];
-          data = yearlyData;
-        } else {
-          labels = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
-          data = dailyData;
+      }
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false
+        },
+        ticks: {
+          color: '#BDC3C7'
         }
+      },
+      y: {
+        grid: {
+          color: 'rgba(255, 255, 255, 0.1)'
+        },
+        ticks: {
+          color: '#BDC3C7',
+          stepSize: 1
+        }
+      }
+    }
+  }
+});
 
-        evolutionChart.data.labels = labels;
-        evolutionChart.data.datasets[0].data = data;
-        evolutionChart.update();
+// Gestion du changement de période avec cases à cocher
+const checkboxes = document.querySelectorAll('.checkbox-option');
+
+checkboxes.forEach(checkbox => {
+  checkbox.addEventListener('change', function() {
+    // Décocher les autres cases
+    if (this.checked) {
+      checkboxes.forEach(cb => {
+        if (cb !== this) cb.checked = false;
       });
-    });
-  </script>
+    } else {
+      // Forcer au moins une case cochée
+      this.checked = true;
+      return;
+    }
 
+    let labels, data;
+
+    if (this.id === 'monthOption') {
+      labels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'];
+      data = monthlyData;
+    } else if (this.id === 'yearOption') {
+      labels = ['2020', '2021', '2022', '2023'];
+      data = yearlyData;
+    } else {
+      labels = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+      data = dailyData;
+    }
+
+    evolutionChart.data.labels = labels;
+    evolutionChart.data.datasets[0].data = data;
+    evolutionChart.update();
+  });
+});
+
+
+    // Chatbot functionality
+    const messages = [
+      {
+        id: 1,
+        user: "Dr. Sophie Martin",
+        avatar: "SM",
+        text: "Le patient présente des symptômes grippaux atypiques.",
+        time: "10:23"
+      },
+      {
+        id: 2,
+        user: "Dr. Ahmed Khan",
+        avatar: "AK",
+        text: "L'IA a détecté un risque de diabète chez le patient #2456.",
+        time: "09:45"
+      },
+      {
+        id: 3,
+        user: "Inf. Laura Dupont",
+        avatar: "LD",
+        text: "Confirmation nécessaire pour le traitement suggéré.",
+        time: "09:30"
+      }
+    ];
+
+    function renderMessages() {
+      const container = document.getElementById('chatbot-messages');
+      container.innerHTML = '';
+
+      messages.forEach(msg => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message';
+        messageDiv.innerHTML = `
+          <div class="message-avatar">${msg.avatar}</div>
+          <div class="message-content">
+            <div class="message-user">${msg.user}</div>
+            <div class="message-text">${msg.text}</div>
+            <div class="message-actions">
+              <button class="message-action" title="Lire" onclick="readMessage(${msg.id})">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="message-action" title="Répondre" onclick="replyToMessage(${msg.id})">
+                <i class="fas fa-reply"></i>
+              </button>
+              <button class="message-action" title="Supprimer" onclick="deleteMessage(${msg.id})">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+            <div class="message-time">${msg.time}</div>
+          </div>
+        `;
+        container.appendChild(messageDiv);
+      });
+
+      // Scroll to bottom
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function readMessage(id) {
+      const message = messages.find(m => m.id === id);
+      alert(`Message de ${message.user}:\n\n${message.text}`);
+    }
+
+    function replyToMessage(id) {
+      const input = document.getElementById('chat-input');
+      const message = messages.find(m => m.id === id);
+      input.value = `@${message.user.split(' ')[1]} `;
+      input.focus();
+    }
+
+    function deleteMessage(id) {
+      if (confirm("Supprimer ce message ?")) {
+        const index = messages.findIndex(m => m.id === id);
+        if (index !== -1) {
+          messages.splice(index, 1);
+          renderMessages();
+        }
+      }
+    }
+
+    // Send new message
+    document.getElementById('send-message').addEventListener('click', sendMessage);
+    document.getElementById('chat-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+
+      if (text) {
+        const newMsg = {
+          id: messages.length + 1,
+          user: "Vous",
+          avatar: "VO",
+          text: text,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        messages.push(newMsg);
+        renderMessages();
+        input.value = '';
+
+        // Simuler une réponse automatique après 1 seconde
+        setTimeout(() => {
+          const botMsg = {
+            id: messages.length + 1,
+            user: "MED_IA Bot",
+            avatar: "IA",
+            text: "Votre message a été enregistré. Un médecin vous répondra sous 24h.",
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+          messages.push(botMsg);
+          renderMessages();
+        }, 1000);
+      }
+    }
+
+    // Initial render
+    renderMessages();
+  </script>
 </body>
 </html>

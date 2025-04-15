@@ -1663,3 +1663,26 @@ textarea {
     }
 }
 
+
+//* Style pour le bouton Connexion */
+.bouton .btn-outline-primary {
+    border-color: #007bff; /* Couleur de la bordure */
+    color: white; /* Couleur du texte */
+    padding: 10px 20px; /* Espacement interne */
+    font-size: 16px; /* Taille du texte */
+    cursor: pointer; /* Curseur en forme de main */
+    border-radius: 5px; /* Arrondis */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transition pour l'effet hover */
+}
+
+/* Effet au survol */
+.bouton .btn-outline-primary:hover {
+    background-color: #007bff; /* Changement de couleur de fond au survol */
+    color: white; /* Changement de couleur du texte au survol */
+}
+
+/* Effet au clic */
+.bouton .btn-outline-primary:active {
+    transform: translateY(2px); /* Petit déplacement vers le bas */
+}
+
